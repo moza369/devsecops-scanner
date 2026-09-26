@@ -2,7 +2,7 @@
 
 > **Automated static analysis for Python codebases** — detects SQL injection, XSS sinks and hardcoded secrets, auto-remediates findings, and integrates natively with the GitHub Security tab via SARIF v2.1.0.
 
-[![Security Gate](https://github.com/your-org/devsecops-scanner/actions/workflows/security-gate.yml/badge.svg)](https://github.com/your-org/devsecops-scanner/actions/workflows/security-gate.yml)
+[![Security Gate](https://github.com/moza369/devsecops-scanner/actions/workflows/security-gate.yml/badge.svg)](https://github.com/moza369/devsecops-scanner/actions/workflows/security-gate.yml)
 [![Tests](https://img.shields.io/badge/tests-42%20passing-brightgreen)](#benchmark--test-results)
 [![SARIF](https://img.shields.io/badge/SARIF-v2.1.0-blue)](https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](https://python.org)
@@ -62,13 +62,13 @@ flowchart TD
 
 ## Features
 
-- 🔴 **SQL Injection** — detects f-strings, `%`-format, `.format()` and string concatenation inside `.execute()` calls, including taint-propagated variables
-- 🟡 **XSS Sinks** — flags `render_template_string`, `Markup`, `mark_safe`, `HttpResponse`, `Response`
-- 🟣 **Hardcoded Secrets** — catches AWS key IDs, AWS secret access keys, and generic `password`/`token`/`api_key` assignments
-- 🔧 **Auto-remediation** (`--fix`) — rewrites SQL queries to parameterised form, replaces hardcoded secrets with `os.getenv()`, injects `import os`, updates `.env.example`
-- 📤 **Multi-format output** — `table`, `json`, `sarif`, `markdown`
-- 🏷️ **SARIF v2.1.0** — upload to GitHub Security tab with `github/codeql-action/upload-sarif`
-- ✅ **42 passing tests**, 0 false positives on parameterised queries and `os.environ` reads
+- **SQL Injection** — detects f-strings, `%`-format, `.format()` and string concatenation inside `.execute()` calls, including taint-propagated variables
+- **XSS Sinks** — flags `render_template_string`, `Markup`, `mark_safe`, `HttpResponse`, `Response`
+- **Hardcoded Secrets** — catches AWS key IDs, AWS secret access keys, and generic `password`/`token`/`api_key` assignments
+- **Auto-remediation** (`--fix`) — rewrites SQL queries to parameterised form, replaces hardcoded secrets with `os.getenv()`, injects `import os`, updates `.env.example`
+- **Multi-format output** — `table`, `json`, `sarif`, `markdown`
+- **SARIF v2.1.0** — upload to GitHub Security tab with `github/codeql-action/upload-sarif`
+- **42 passing tests**, 0 false positives on parameterised queries and `os.environ` reads
 
 ---
 

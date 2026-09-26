@@ -1,0 +1,5 @@
+rich
+pydantic
+pytest
+streamlit
+werkzeug

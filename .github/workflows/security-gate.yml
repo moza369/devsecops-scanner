@@ -1,0 +1,80 @@
+name: Security Gate
+
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+  security-events: write   # required for upload-sarif
+
+jobs:
+  security-scan:
+    name: Static Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Checkout
+      # -----------------------------------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # 2. Python environment
+      # -----------------------------------------------------------------------
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # -----------------------------------------------------------------------
+      # 3. Dependencies
+      # -----------------------------------------------------------------------
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # -----------------------------------------------------------------------
+      # 4. Unit tests
+      # -----------------------------------------------------------------------
+      - name: Run pytest
+        run: |
+          pytest tests/ \
+            --tb=short \
+            -q \
+            --junit-xml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.xml
+
+      # -----------------------------------------------------------------------
+      # 5. Security scan — SARIF output
+      # -----------------------------------------------------------------------
+      - name: Run DevSecOps scanner
+        # Always run so we upload SARIF even when findings exist.
+        # The exit code is handled separately below.
+        run: |
+          python main.py . --format sarif --output results.sarif || true
+
+      # -----------------------------------------------------------------------
+      # 6. Upload SARIF to GitHub Security tab
+      # -----------------------------------------------------------------------
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          category: devsecops-scanner
+
+      # -----------------------------------------------------------------------
+      # 7. Fail the job if the scanner found vulnerabilities
+      #    (re-run without --output to get a human-readable summary)
+      # -----------------------------------------------------------------------
+      - name: Assert no findings
+        run: python main.py . --format table

@@ -61,7 +61,7 @@ jobs:
         # Always run so we upload SARIF even when findings exist.
         # The exit code is handled separately below.
         run: |
-          python main.py . --format sarif --output results.sarif || true
+          python main.py core/ ui/ main.py --format sarif --output results.sarif 
 
       # -----------------------------------------------------------------------
       # 6. Upload SARIF to GitHub Security tab
@@ -70,8 +70,11 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
-          category: devsecops-scanner
+        if: always()
 
+    - name: Enforce Security Gate
+      run: |
+        python main.py core/ ui/ main.py --format table
       # -----------------------------------------------------------------------
       # 7. Fail the job if the scanner found vulnerabilities
       #    (re-run without --output to get a human-readable summary)

@@ -17,42 +17,21 @@ from pathlib import Path
 # Hook script template
 # ---------------------------------------------------------------------------
 
-_HOOK_SCRIPT = """\
-#!/usr/bin/env bash
-# DevSecOps scanner pre-commit hook (auto-generated — do not edit manually).
-# Re-install with: python main.py --install-hook
+HOOK_SCRIPT = """#!/usr/bin/env bash
+# DevSecOps Scanner Pre-Commit Gate
+echo "🔒 [DevSecOps Scanner] Auditing staged code before commit..."
 
-set -euo pipefail
+python3 main.py . --format table
+SCAN_EXIT_CODE=$?
 
-REPO_ROOT="$(git rev-parse --show-toplevel)"
-SCANNER="$(dirname "$(realpath "$0")")/../../main.py"
-
-# Locate main.py: try relative to .git/hooks, then fall back to CWD.
-if [ ! -f "$SCANNER" ]; then
-    SCANNER="$REPO_ROOT/main.py"
-fi
-
-echo "[devsecops-scanner] Running pre-commit security scan..."
-
-# Run the scanner; capture its exit code without aborting the hook script.
-set +e
-python3 "$SCANNER" . --format table
-SCAN_EXIT=$?
-set -e
-
-if [ "$SCAN_EXIT" -ne 0 ]; then
+if [ $SCAN_EXIT_CODE -ne 0 ]; then
     echo ""
-    echo "╔══════════════════════════════════════════════════════════════╗"
-    echo "║  🚨  COMMIT BLOCKED — security findings detected             ║"
-    echo "╠══════════════════════════════════════════════════════════════╣"
-    echo "║  Fix automatically:  python main.py . --fix                  ║"
-    echo "║  Review in UI:       python -m streamlit run ui/dashboard.py ║"
-    echo "║  Bypass (danger!):   git commit --no-verify                  ║"
-    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo "❌ Commit rejected: Critical security findings detected in source code."
+    echo "👉 Run 'python3 main.py . --fix' or launch 'streamlit run ui/dashboard.py' to remediate."
     exit 1
 fi
 
-echo "[devsecops-scanner] No critical findings — commit allowed."
+echo "✅ [DevSecOps Scanner] Security checks passed."
 exit 0
 """
 
@@ -77,7 +56,7 @@ def install_pre_commit_hook(repo_root: Path) -> tuple[bool, str]:
     hook_path = hooks_dir / "pre-commit"
 
     try:
-        hook_path.write_text(_HOOK_SCRIPT, encoding="utf-8")
+        hook_path.write_text(HOOK_SCRIPT, encoding="utf-8")
         # Set rwxr-xr-x (0o755)
         current_mode = hook_path.stat().st_mode
         hook_path.chmod(current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)

@@ -518,7 +518,7 @@ def _scan_php(lines: list[str], filename: str) -> list[Finding]:
 
 # Directories that should never be scanned (virtual envs, caches, VCS, build
 # artefacts, third-party package trees, and test directories).
-IGNORE_DIRS: set[str] = {
+IGNORE_DIRS = {
     ".git",
     "venv",
     ".venv",
@@ -531,8 +531,8 @@ IGNORE_DIRS: set[str] = {
     "tests",
     "test",
     "testing",
+    "mock_vulnerable_repo",
 }
-
 
 def _is_test_file(name: str) -> bool:
     """Return True if *name* looks like a test file (test_foo.py or foo_test.py)."""

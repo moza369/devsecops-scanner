@@ -44,7 +44,7 @@ jobs:
 
       - name: Run DevSecOps scanner (SARIF output)
         run: |
-          python main.py core/ ui/ main.py --format sarif --output results.sarif
+          python main.py . --format sarif --output results.sarif
 
       - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v3
@@ -54,4 +54,4 @@ jobs:
 
       - name: Enforce Security Gate
         run: |
-          python main.py core/ ui/ main.py --format table
+          python main.py . --format table
